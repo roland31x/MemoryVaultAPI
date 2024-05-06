@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryVaultAPI", "MemoryVaultAPI\MemoryVaultAPI.csproj", "{025A3438-DA62-418C-8804-916C31237CFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{025A3438-DA62-418C-8804-916C31237CFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{025A3438-DA62-418C-8804-916C31237CFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{025A3438-DA62-418C-8804-916C31237CFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{025A3438-DA62-418C-8804-916C31237CFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F39A4BEC-91C1-47DE-9957-B7EA9A3EBB0C}
+	EndGlobalSection
+EndGlobal
