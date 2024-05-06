@@ -42,6 +42,10 @@ namespace MemoryVaultAPI
                 .HasColumnType("nvarchar(100)")
                 .IsRequired();
 
+                entity.Property(e => e.IsAdmin)
+                .HasColumnType("bit")
+                .IsRequired();
+
             });
         }
 
