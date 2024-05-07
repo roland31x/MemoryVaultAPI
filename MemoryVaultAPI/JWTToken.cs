@@ -22,6 +22,9 @@ namespace MemoryVaultAPI
                 new Claim(ClaimTypes.Role, "LoginToken"),
             };
 
+            if (user.IsAdmin)
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
             var token = new JwtSecurityToken(_config["JWT:Issuer"],
                 _config["JWT:Audience"],
                 claims,

@@ -71,6 +71,13 @@ namespace MemoryVaultAPI
                 .WithMany(m => m.Memories)
                 .HasForeignKey(m => m.OwnerID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+                entity.OwnsMany(e => e.Images, img =>
+                {
+                    img.Property(i => i.bytes)
+                    .HasColumnType("varbinary(max)")
+                    .IsRequired();
+                });
             });
         }
     }

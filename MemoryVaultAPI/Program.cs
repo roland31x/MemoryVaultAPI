@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MemoryVaultAPI.Models;
 
 namespace MemoryVaultAPI
 {
@@ -30,7 +31,7 @@ namespace MemoryVaultAPI
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminRights",
-                    policy => policy.RequireRole("admin"));
+                    policy => policy.RequireRole("Admin"));
                 options.AddPolicy("LoginTokens",
                     policy => policy.RequireRole("LoginToken"));
                 options.AddPolicy("PasswordTokens",
@@ -83,6 +84,8 @@ namespace MemoryVaultAPI
             app.MapControllers();
 
             app.Run();
+
+            
         }
     }
 }
