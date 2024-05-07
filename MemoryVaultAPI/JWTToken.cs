@@ -28,7 +28,7 @@ namespace MemoryVaultAPI
             var token = new JwtSecurityToken(_config["JWT:Issuer"],
                 _config["JWT:Audience"],
                 claims,
-                expires: DateTime.Now.AddMonths(12),
+                expires: DateTime.Now.AddMonths(1),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

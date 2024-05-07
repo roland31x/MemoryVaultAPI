@@ -188,5 +188,37 @@ namespace MemoryVaultAPI.Controllers
             }
             
         }
+
+        [HttpGet]
+        [Route("random")]
+        [Authorize(Policy = "LoginTokens")]
+        public IActionResult GetRandomMemories()
+        {
+
+            try
+            {
+                int amount = 5;
+                List<int> usedidx = new List<int>();
+                List<Memory> memories = new List<Memory>();
+                List<Memory> pub = _ctx.Memories.Include(m => m.Owner).Where(x => x.Public).ToList();
+                if (pub.Count < amount)
+                    amount = pub.Count;
+                Random r = new Random();
+                for (int i = 0; i < amount; i++)
+                {
+                    int idx = r.Next(0, pub.Count);
+                    while (usedidx.Contains(idx))
+                        idx = r.Next(0, pub.Count);
+                    usedidx.Add(idx);
+                    memories.Add(pub[idx]);
+                }
+                return new OkObjectResult(new PHPResponse(200, memories, "Fetched random memories!"));
+            }
+            catch (Exception e)
+            {
+                return new ObjectResult(new PHPResponse(500, null, e.Message));
+            }
+            
+        }
     }
 }

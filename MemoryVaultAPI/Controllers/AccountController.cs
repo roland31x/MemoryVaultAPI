@@ -24,28 +24,15 @@ namespace MemoryVaultAPI.Controllers
         {
             try
             {
-                for (int i = 0; i < 25; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Account toCreate = new Account
                     {
-                        Username = "TestUser" + i,
-                        Email = "TestUser" + i + "@gmail.com",
-                        Password = "TestPassword" + i
+                        Username = "user" + i,
+                        Email = "u" + i + "@fake_gmail.com",
+                        Password = HashPassword("password" + i),
                     };
                     _ctx.Accounts.Add(toCreate);
-                    for (int k = 0; k < 50; k++)
-                    {
-                        Memory mem = new Memory()
-                        {
-                            Description = "Test Memory " + k + " for " + toCreate.Username,
-                            Name = "Memory " + k,
-                            Owner = toCreate,
-                            Images = new List<Image>(),
-                            PostDate = RandomDate(),
-                        };
-                        mem.Images.Add(new Image([]));
-                        _ctx.Memories.Add(mem);
-                    }
                 }
                 _ctx.SaveChanges();
                 return new OkObjectResult(new PHPResponse(200, null, "Test Successful!"));
@@ -59,8 +46,18 @@ namespace MemoryVaultAPI.Controllers
 
         private DateTime RandomDate()
         {
-            int range = (DateTime.Today - new DateTime(2000, 1, 1)).Days;
+            int range = (DateTime.Today - new DateTime(2020, 1, 1)).Days;
             return new DateTime(2000, 1, 1).AddDays(new Random().Next(range));
+        }
+
+        private string HashPassword(string password)
+        {
+            string hashed = BCrypt.Net.BCrypt.HashPassword(password);
+            return hashed;
+        }
+        private bool VerifyPassword(string password, string hash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hash);
         }
 
         [HttpGet]
@@ -132,7 +129,7 @@ namespace MemoryVaultAPI.Controllers
 
                 user.Username = Account.Username;
                 user.Email = Account.Email;
-                user.Password = Account.Password;
+                user.Password = HashPassword(Account.Password);
 
                 _ctx.SaveChanges();
 
@@ -155,6 +152,8 @@ namespace MemoryVaultAPI.Controllers
                     return new ObjectResult(new PHPResponse(400, null, "Password must be at least 4 characters long!"));
                 if (Account.Username.Length < 4)
                     return new ObjectResult(new PHPResponse(400, null, "Username must be at least 4 characters long!"));
+                if (Account.Username.Length > 16)
+                    return new ObjectResult(new PHPResponse(400, null, "Username must be at most 16 characters long!"));
                 if (!Account.Email.Contains('@'))
                     return new ObjectResult(new PHPResponse(400, null, "Invalid Email!"));
 
@@ -163,7 +162,7 @@ namespace MemoryVaultAPI.Controllers
                 {
                     Username = Account.Username,
                     Email = Account.Email,
-                    Password = Account.Password
+                    Password = HashPassword(Account.Password),
                 };
 
                 List<Account> accounts = _ctx.Accounts.ToList();
@@ -192,11 +191,11 @@ namespace MemoryVaultAPI.Controllers
         {
             try
             {
-                Account? account = _ctx.Accounts.Where(a => a.Username == login.Credential || a.Email == login.Credential).FirstOrDefault();
+                Account? account = _ctx.Accounts.Where(a => a.Username.ToLower() == login.Credential.ToLower() || a.Email.ToLower() == login.Credential.ToLower()).FirstOrDefault();
                 if(account == null)
                     return new ObjectResult(new PHPResponse(400, null, "Account not found!"));
 
-                if(account.Password != login.Password)
+                if (!VerifyPassword(login.Password, account.Password))
                     return new ObjectResult(new PHPResponse(400, null, "Invalid Password!"));
 
                 string token = JWTToken.GenerateToken(account, _config);
