@@ -59,7 +59,7 @@ namespace MemoryVaultAPI.Controllers
                 if (user == null)
                     return new ObjectResult(new PHPResponse(400, null, "User not found!"));
 
-                return new OkObjectResult(new PHPResponse(200, user.Memories.ToList(), "Fetched all memories for this account!"));
+                return new OkObjectResult(new PHPResponse(200, user.Memories.Select(x => new MemoryShortImage(x, x.Likes.Where(y => y.LikerID == user.AccountID).Any())), "Fetched all memories for this account!"));
             }
             catch (Exception e)
             {
@@ -177,16 +177,38 @@ namespace MemoryVaultAPI.Controllers
         [Authorize(Policy = "AdminRights")]
         public IActionResult GetMemoriesAdmin()
         {
-
+            //int pageNumber = pag.PageNumber;
+            //int pageSize = pag.PageSize;
             try
             {
-                return new OkObjectResult(new PHPResponse(200, _ctx.Memories.Include(m => m.Owner).Include(m => m.Likes).ToList(), "Fetched all memories as admin!"));
+                var pagedMemories = _ctx.Memories
+                                        .Include(m => m.Owner)
+                                        .Include(m => m.Likes)
+                                        //.Skip((pageNumber - 1) * pageSize)
+                                        .Select(m => new MemoryShort(m))
+                                        .ToList();
+
+                return new OkObjectResult(new PHPResponse(200, pagedMemories, $"Fetched memories as admin!"));
+            }
+            catch (Exception e)
+            {
+                return new ObjectResult(new PHPResponse(500, null, e.Message));
+            }  
+        }
+        [HttpPost]
+        [Route("admin/get/pages")]
+        [Authorize(Policy = "AdminRights")]
+        public IActionResult GetPagesAdmin([FromBody] Pagination pag)
+        {
+            try
+            {
+                int pages = _ctx.Memories.Count() / pag.PageSize;
+                return new OkObjectResult(new PHPResponse(200, pages, "Fetched all memories as admin!"));
             }
             catch (Exception e)
             {
                 return new ObjectResult(new PHPResponse(500, null, e.Message));
             }
-            
         }
 
         [HttpGet]
@@ -197,9 +219,11 @@ namespace MemoryVaultAPI.Controllers
 
             try
             {
+                int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
                 int amount = 5;
                 List<int> usedidx = new List<int>();
-                List<Memory> memories = new List<Memory>();
+                List<MemoryShortImage> memories = new List<MemoryShortImage>();
                 List<Memory> pub = _ctx.Memories.Include(m => m.Owner).Include(m => m.Likes).Where(x => x.Public).ToList();
                 if (pub.Count < amount)
                     amount = pub.Count;
@@ -210,7 +234,7 @@ namespace MemoryVaultAPI.Controllers
                     while (usedidx.Contains(idx))
                         idx = r.Next(0, pub.Count);
                     usedidx.Add(idx);
-                    memories.Add(pub[idx]);
+                    memories.Add(new MemoryShortImage(pub[idx], pub[idx].Likes.Where(y => y.LikerID == userId).Any()));
                 }
                 return new OkObjectResult(new PHPResponse(200, memories, "Fetched random memories!"));
             }
