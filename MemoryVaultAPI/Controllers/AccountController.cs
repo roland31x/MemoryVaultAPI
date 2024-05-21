@@ -65,14 +65,14 @@ namespace MemoryVaultAPI.Controllers
         [Authorize(Policy = "LoginTokens")]
         public IActionResult GetProfile([FromRoute] int id)
         {
-
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             try
             {
                 Account account = _ctx.Accounts.Include(a => a.Memories).ThenInclude(m => m.Likes).First(x => x.AccountID == id);
                 if (account == null)
                     return new ObjectResult(new PHPResponse(400, null, "Account not found!"));
 
-                AccProfile profile = new AccProfile(account);
+                AccProfile profile = new AccProfile(account, userId);
 
                 return new OkObjectResult(new PHPResponse(200, profile, "Fetched account!"));
             }
