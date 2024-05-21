@@ -1,4 +1,6 @@
-﻿namespace MemoryVaultAPI.Models
+﻿using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+
+namespace MemoryVaultAPI.Models
 {
     public class Memory
     {
@@ -8,6 +10,7 @@
         public string Description { get; set; }
         public bool Public { get; set; }
         public List<Image> Images { get; set; } = new List<Image>();
+        public List<Like> Likes { get; set; } = new List<Like>();
         public Account Owner { get; set; }
         public int OwnerID { get; set; }
     }
@@ -19,6 +22,14 @@
         {
             this.bytes = bytes;
         }
+    }
+
+    public class Like
+    {
+        public Account Liker { get; set; }
+        public int LikerID { get; set; }
+        public Memory Memory { get; set; }
+        public int MemoryID { get; set; }
     }
 
     public class MemoryEntry

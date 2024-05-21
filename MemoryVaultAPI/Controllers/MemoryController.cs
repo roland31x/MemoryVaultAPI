@@ -55,7 +55,7 @@ namespace MemoryVaultAPI.Controllers
 
             try
             {
-                Account user = _ctx.Accounts.Include(m => m.Memories).First(x => x.AccountID == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value));
+                Account user = _ctx.Accounts.Include(m => m.Memories).Include(m => m.Likes).First(x => x.AccountID == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value));
                 if (user == null)
                     return new ObjectResult(new PHPResponse(400, null, "User not found!"));
 
@@ -80,7 +80,7 @@ namespace MemoryVaultAPI.Controllers
                 if (user == null)
                     return new ObjectResult(new PHPResponse(400, null, "User not found!"));
 
-                Memory memory = _ctx.Memories.Include(m => m.Owner).First(x => x.MemoryID == id);
+                Memory memory = _ctx.Memories.Include(m => m.Owner).Include(m => m.Likes).First(x => x.MemoryID == id);
                 if (memory == null)
                     return new ObjectResult(new PHPResponse(400, null, "Memory not found!"));
 
@@ -180,7 +180,7 @@ namespace MemoryVaultAPI.Controllers
 
             try
             {
-                return new OkObjectResult(new PHPResponse(200, _ctx.Memories.Include(m => m.Owner).ToList(), "Fetched all memories as admin!"));
+                return new OkObjectResult(new PHPResponse(200, _ctx.Memories.Include(m => m.Owner).Include(m => m.Likes).ToList(), "Fetched all memories as admin!"));
             }
             catch (Exception e)
             {
@@ -200,7 +200,7 @@ namespace MemoryVaultAPI.Controllers
                 int amount = 5;
                 List<int> usedidx = new List<int>();
                 List<Memory> memories = new List<Memory>();
-                List<Memory> pub = _ctx.Memories.Include(m => m.Owner).Where(x => x.Public).ToList();
+                List<Memory> pub = _ctx.Memories.Include(m => m.Owner).Include(m => m.Likes).Where(x => x.Public).ToList();
                 if (pub.Count < amount)
                     amount = pub.Count;
                 Random r = new Random();

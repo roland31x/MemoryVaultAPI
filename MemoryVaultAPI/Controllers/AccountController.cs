@@ -68,7 +68,7 @@ namespace MemoryVaultAPI.Controllers
 
             try
             {
-                Account account = _ctx.Accounts.Include(a => a.Memories).First(x => x.AccountID == id);
+                Account account = _ctx.Accounts.Include(a => a.Memories).ThenInclude(m => m.Likes).First(x => x.AccountID == id);
                 if (account == null)
                     return new ObjectResult(new PHPResponse(400, null, "Account not found!"));
 
@@ -222,7 +222,6 @@ namespace MemoryVaultAPI.Controllers
             {
                 return new ObjectResult(new PHPResponse(500, null, e.Message));
             }
-           
         }
 
         [HttpDelete]

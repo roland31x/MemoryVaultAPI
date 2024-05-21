@@ -8,7 +8,7 @@
         public string Password { get; set; }
         public bool IsAdmin { get; set; } = false;
         public List<Memory> Memories { get; set; } = new List<Memory>();
-        
+        public List<Like> Likes { get; set; } = new List<Like>();
     }
     public class AccProfile
     {

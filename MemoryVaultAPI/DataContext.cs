@@ -12,11 +12,27 @@ namespace MemoryVaultAPI
         }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Memory> Memories { get; set; }
+        public DbSet<Like> Likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateAccounts(modelBuilder);
             CreateMemories(modelBuilder);
+
+            modelBuilder.Entity<Like>(entity =>
+            {
+                entity.HasKey(e => new { e.MemoryID, e.LikerID });
+
+                entity.HasOne(e => e.Liker)
+                .WithMany(a => a.Likes)
+                .HasForeignKey(e => e.LikerID)
+                .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.Memory)
+                .WithMany(m => m.Likes)
+                .HasForeignKey(e => e.MemoryID)
+                .OnDelete(DeleteBehavior.NoAction);
+            });
         }
         private void CreateAccounts(ModelBuilder modelBuilder)
         {
@@ -45,7 +61,6 @@ namespace MemoryVaultAPI
                 entity.Property(e => e.IsAdmin)
                 .HasColumnType("bit")
                 .IsRequired();
-
             });
         }
 
@@ -78,6 +93,7 @@ namespace MemoryVaultAPI
                     .HasColumnType("varbinary(max)")
                     .IsRequired();
                 });
+
             });
         }
     }
